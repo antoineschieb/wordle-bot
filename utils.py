@@ -10,7 +10,12 @@ class Property:
 
 def load_words(prefix): #"allowed" or "possible"
     W=list()
-    with open(prefix+'_words.txt') as f:
+    
+    # with open('data/words.txt') as f:
+    if prefix=="allowed":filestr = "data/words.txt"
+    else: filestr = "data/possible_words.txt"
+
+    with open(filestr) as f:
             for line in f:
                 W.append(line[:-1])
     return W
@@ -38,10 +43,10 @@ def evaluate_guess(target,guess,verbose=True):
 
 
 def best_words_from_set(s,verbose=False):
-    global W
+    global AW
     max_l = 0
     ret = []
-    for w in W:
+    for w in AW:
         ws = set(w)
         inter = ws.intersection(s)
         l = len(inter)

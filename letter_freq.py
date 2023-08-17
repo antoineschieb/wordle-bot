@@ -1,20 +1,23 @@
 from state import State
-from utils import  W, Property as P, best_words_from_set, evaluate_guess
+from utils import  AW, Property as P, best_words_from_set, evaluate_guess
 
 
 
 def get_letter_freq_in_W(): #modify init_alphabet: [] -> [0]
     s = State()
-    for w in W:
-        print(w)
+    for w in AW:
         for l in list(w):
-            print(l)
             s.alphabet.update({l : P("white",[s.alphabet[l].info[0]+1])})
     return s
 
 
+#tondi
+bb = best_words_from_set(set(list("laser")),verbose=True) #  CHUMP !!!!! 3e guess
 
-bb = best_words_from_set(set(list("mycup")),verbose=True) #  CHUMP !!!!! 3e guess
+## best strat : 
+# laser 4/5 most used, except l(7th) replaces o(4th)
+# tondi 
+# chump 
 
 # s = State()
 # for l in list("alertdinos"):

@@ -1,7 +1,7 @@
 import string
 from copy import deepcopy
 
-from utils import Property, W, evaluate_guess ,best_words_from_set 
+from utils import Property, PW, evaluate_guess, best_words_from_set 
 
 
 
@@ -33,9 +33,10 @@ class State:
 
 
     def update_from_eval(self,eval):
+        """ Update state from evaluation object (list of 5 tuples where each tuple is ('letter',Property()) """
         for letter,prop in eval:
 
-            assert prop.color!="white"
+            assert prop.color!="white" # No eval should ever return a white tile.
 
             if prop.color=="green":
                 self.guess_so_far[prop.info[0]] = letter
@@ -64,8 +65,9 @@ class State:
         return 
 
     def could_be(self,word):
-
+        """Check if a word could be the final answer for this current state"""
         # First, check if it matches our guess so far
+        
         for i,l in enumerate(self.guess_so_far):
             if l=='_':continue
             if list(word)[i] != l:
@@ -84,10 +86,11 @@ class State:
 
 
     def get_all_words(self,verbose=False):
-        global W
+        """Get all words that could be a valid final answer for the current state"""
+        global PW
         c=0
         r=list()
-        for w in W:
+        for w in PW:
             if self.could_be(w):
                 if verbose:print(w)
                 r.append(w)
@@ -98,29 +101,30 @@ class State:
 
 
     def propose_word(self):
-        global W
+        # global AW
         possible_words = self.get_all_words()
         min_mean_score = float(len(possible_words))
         idx_ret = 0
         WYS = self.get_white_yellow_set()
-        WW = best_words_from_set(WYS)
-        print(f'number of words to choose from : {len(WW)}')
+        constructible_words = best_words_from_set(WYS)
+        print(f'number of words to choose from : {len(constructible_words)}')
         
-        for widx,w in enumerate(WW):
+        for widx,w in enumerate(constructible_words):
             mean_score = 0
             for pw in possible_words:
                 """Let's assume that the target is pw"""
-                ps = deepcopy(self) # possible state (if pw is the actual word)
+                ps = deepcopy(self) # possible state (if pw is the actual target)
                 e = evaluate_guess(pw,w,verbose=False)
                 ps.update_from_eval(e)
                 l = len(ps.get_all_words(verbose=False))
                 mean_score += l/len(possible_words)
             # print(f'mean score for word {w} is {mean_score}.')
+            print(f'propose_word {round(100*widx/len(constructible_words),2)}%', end="\r")
             if mean_score <= min_mean_score:
                 min_mean_score = mean_score
                 idx_ret = widx
-                print(f'propose_word {round(100*idx_ret/len(WW),2)}% : {min_mean_score} average possibilities for word {w}')
+                print(f'propose_word {round(100*idx_ret/len(constructible_words),2)}% : {min_mean_score} average possibilities for word {w}')
                 if mean_score <= 1:
-                    return WW[idx_ret]
-
-        return WW[idx_ret]
+                    return constructible_words[idx_ret]
+        print("                       ")
+        return constructible_words[idx_ret]

@@ -15,8 +15,6 @@ def generate_user_eval():
         else: raise ValueError
     return ev
 
-        
-
 
 def main():
     s = State()
